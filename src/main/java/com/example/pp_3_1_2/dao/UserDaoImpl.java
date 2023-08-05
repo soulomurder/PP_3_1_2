@@ -1,13 +1,8 @@
 package com.example.pp_3_1_2.dao;
 
-import org.springframework.transaction.TransactionDefinition;
 import com.example.pp_3_1_2.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,10 +13,7 @@ import java.util.List;
 public class UserDaoImpl implements UserDao {
 
    @PersistenceContext
-   public EntityManager em;
-
-   @Autowired
-   private PlatformTransactionManager transactionManager;
+   private EntityManager em;
 
    @Transactional(readOnly = true)
    @Override
@@ -34,40 +26,21 @@ public class UserDaoImpl implements UserDao {
    @Transactional
    @Override
    public void createUser(User user) {
-      TransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-      TransactionStatus transactionStatus = transactionManager.getTransaction(transactionDefinition);
-      try {
-         em.persist(user);
-         transactionManager.commit(transactionStatus);
-      } catch (Exception ex) {
-         transactionManager.rollback(transactionStatus);
-      }
+      em.persist(user);
    }
 
    @Transactional
    @Override
    public void editEmail(Long id, String newEmail) {
-      TransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-      TransactionStatus transactionStatus = transactionManager.getTransaction(transactionDefinition);
-      try {
-         em.find(User.class, id).setEmail(newEmail);
-         transactionManager.commit(transactionStatus);
-      } catch (Exception ex) {
-         transactionManager.rollback(transactionStatus);
-      }
+      User user = getUserById(id);
+      if (user != null) user.setEmail(newEmail);
    }
 
    @Transactional
    @Override
    public void dropUser(Long id) {
-      TransactionDefinition transactionDefinition = new DefaultTransactionDefinition();
-      TransactionStatus transactionStatus = transactionManager.getTransaction(transactionDefinition);
-      try {
-         em.remove(em.find(User.class, id));
-         transactionManager.commit(transactionStatus);
-      } catch (Exception ex) {
-         transactionManager.rollback(transactionStatus);
-      }
+      User user = getUserById(id);
+      if (user != null) em.remove(user);
    }
 
    @Transactional(readOnly = true)
