@@ -4,29 +4,29 @@ import com.example.pp_3_1_2.model.User;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import java.util.List;
 
 @Repository
 public class UserDaoImpl implements UserDao {
 
    @PersistenceContext
-   private EntityManager em;
+   private EntityManager entityManager;
 
    @Transactional(readOnly = true)
    @Override
    @SuppressWarnings("unchecked")
    public List<User> listUsers() {
-      Query query = em.createQuery("from User", User.class);
+      Query query = entityManager.createQuery("from User", User.class);
       return (List<User>) query.getResultList();
    }
 
    @Transactional
    @Override
    public void createUser(User user) {
-      em.persist(user);
+      entityManager.persist(user);
    }
 
    @Transactional
@@ -40,12 +40,12 @@ public class UserDaoImpl implements UserDao {
    @Override
    public void dropUser(Long id) {
       User user = getUserById(id);
-      if (user != null) em.remove(user);
+      if (user != null) entityManager.remove(user);
    }
 
    @Transactional(readOnly = true)
    @Override
    public User getUserById(Long id) {
-      return em.find(User.class, id);
+      return entityManager.find(User.class, id);
    }
 }
